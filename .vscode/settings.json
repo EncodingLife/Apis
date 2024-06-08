@@ -1,5 +1,11 @@
 {
     "files.exclude": {
         "**/target": true
-    }
+    },
+    "rust-analyzer.cargo.features": [
+        "bevy"
+    ],
+    "cSpell.words": [
+        "verts"
+    ]
 }

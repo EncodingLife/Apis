@@ -6,7 +6,10 @@ const ORIENTATION_START_ANGLE: u8 = 0;
 
 #[derive(Copy,Clone,Debug)]
 pub struct HexLayout {
-    pub size: Vec2
+    #[cfg(not(feature="bevy"))]
+    pub size: glam::Vec2,
+    #[cfg(feature = "bevy")]
+    pub size: bevy::math::Vec2
 }
 
 impl HexLayout {

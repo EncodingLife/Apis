@@ -6,4 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-glam = "0.27.0"
+bevy = { version = "0.13.2", default-features = false, features = ["bevy_render"], optional = true }
+glam = { version= "0.25.0", features = ["bytemuck"] }
+
+[features]
+bevy = ["dep:bevy"]
