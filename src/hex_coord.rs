@@ -10,21 +10,17 @@ const F2: f32 = 0.86602540378; // f32::sqrt(3.0) / 2.0;
 const F3: f32 = 1.73205080757; // f32::sqrt(3.0);
 
 
-#[derive(Debug, Eq, Clone, Copy)]
+#[derive(Debug, Eq, Clone, Copy, Hash)]
 pub struct HexCoord([i32;3]);
 
-
-impl HexCoordinate<i32> for HexCoord {
-    fn new(q: i32, r: i32, s: i32) -> Self {
+impl HexCoord {
+    pub fn new(q: i32, r: i32, s: i32) -> Self {
         assert_eq!(q+r+s, 0, "QRS must add up to 0");
         Self([q,r,s])
     }
+}
 
-    fn new_qr(q:i32, r:i32) -> Self {
-        Self([q,r,-q-r])
-    }
-
-
+impl HexCoordinate<i32> for HexCoord {
     fn dist(&self, rhs: Self) -> i32 {
         let d = *self - rhs;
         (d.0[0].abs() + d.0[1].abs() + d.0[2].abs()) / 2
@@ -89,6 +85,9 @@ macro_rules! hex {
     ($q:literal, $r:literal, $s:literal) => {
         HexCoord::new($q,$r, $s)
     };
+    ($q:ident, $r:ident, $s:ident) => {
+        HexCoord::new($q,$r, $s)
+    };
 }
 
 #[cfg(test)]
@@ -97,11 +96,12 @@ mod test {
 
     #[test]
     fn hex_macro() {
-        assert_eq!(hex!(1,-1, 0), HexCoord::new(1,-1,0));
-        assert_eq!(hex!(1,-1), HexCoord::new(1,-1,0));
+        assert_eq!(hex!(1,-1, 0), hex!(1,-1,0));
+        assert_eq!(hex!(1,-1), hex!(1,-1,0));
         let r = 5;
         let s = 8;
-        assert_eq!(hex!(r,s), HexCoord::new(r,s,-r-s));
+        let q = -r-s;
+        assert_eq!(hex!(r,s), hex!(r, s, q));
     }
 
     #[test]

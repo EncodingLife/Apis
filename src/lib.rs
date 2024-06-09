@@ -3,6 +3,8 @@ mod fractional_coord;
 mod hex_coord;
 mod layout;
 mod shape;
+mod map;
+mod edge;
 
 pub use crate::hex_coord::HexCoord;
 pub use crate::hex_trait::HexCoordinate;
