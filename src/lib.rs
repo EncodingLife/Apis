@@ -4,6 +4,7 @@ mod hex_coord;
 mod layout;
 mod shape;
 mod edge;
+#[cfg(feature = "map")]
 mod map;
 
 pub use crate::hex_coord::HexCoord;
