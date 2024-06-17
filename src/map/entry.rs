@@ -1,49 +1,85 @@
+use std::{cell::UnsafeCell, marker::PhantomData, ptr};
+
+use petgraph::graph::NodeIndex;
+
 use crate::HexCoord;
 
-use super::{map::{HexIndex, HexMap}, node_ref::NodeRef};
+use super::map::HexMap;
 
-pub enum MapEntry<'a, T: 'a> {
+
+pub struct UnsafeMapCell<'a, T>(*mut HexMap<T>, PhantomData<(&'a HexMap<T>, &'a UnsafeCell<HexMap<T>>)>);
+
+impl<'a, T> UnsafeMapCell<'a, T> {
+    pub(crate) fn new_mutable(map: &'a mut HexMap<T>) -> Self {
+        Self(ptr::from_mut(map), PhantomData)
+    }
+
+    pub(crate) fn new(map: &'a HexMap<T>) -> Self {
+        Self(ptr::from_ref(map).cast_mut(), PhantomData)
+    }
+}
+
+pub struct UnsafeNodeCell<'a, T> {
+    map: UnsafeMapCell<'a, T>,
+    coord: HexCoord,
+    index: NodeIndex<u32>
+}
+
+impl<'a, T> UnsafeNodeCell<'a, T> {
+    pub(crate) fn new(map: UnsafeMapCell<'a, T>, coord: HexCoord, index: NodeIndex<u32>) -> Self {
+        UnsafeNodeCell {
+            map,
+            coord,
+            index
+        }
+    }
+}
+
+pub struct NodeRef<'a, T>(UnsafeNodeCell<'a, T>);
+
+impl<'a, T> NodeRef<'a, T> {
+    pub(crate) unsafe fn new(cell: UnsafeNodeCell<'a,T>) -> Self {
+        Self(cell)
+    }
+}
+
+pub struct NodeRefMut<'a, T>(UnsafeNodeCell<'a, T>);
+
+impl<'a, T> NodeRefMut<'a, T> {
+    pub(crate) unsafe fn new(cell: UnsafeNodeCell<'a,T>) -> Self {
+        Self(cell)
+    }
+}
+
+impl<T> HexMap<T> {
+    pub(crate) fn as_unsafe_map_mut_cell(&mut self) -> UnsafeMapCell<T> {
+        UnsafeMapCell::new_mutable(self)
+    }
+
+    pub(crate) fn as_unsafe_map_cell(&self) -> UnsafeMapCell<T> {
+        UnsafeMapCell::new(self)
+    }
+}
+
+pub enum MapEntry<'a, T> {
     Occupied(OccupiedMapEntry<'a, T>),
     Vacant(VacantMapEntry<'a, T>)
 }
 
 pub struct OccupiedMapEntry<'a, T> {
-    pub(super) coord: HexCoord,
-    pub(super) node: NodeRef<T>,
-    pub(super) map: &'a mut HexMap<T>
+    node_ref: &'a mut NodeRefMut<'a, T>,
+    _marker: PhantomData<T>
+}
+
+impl<'a, T> OccupiedMapEntry<'a, T> {
+
 }
 
 pub struct VacantMapEntry<'a, T> {
-    pub(super) coord: HexCoord,
-    pub(super) map: &'a mut HexMap<T>
+    node_ref: &'a mut NodeRefMut<'a, T>,
+    _marker: PhantomData<T>
 }
 
-// MapEntry
+impl<'a, T> VacantMapEntry<'a, T> {
 
-impl<'m, T> MapEntry<'m, T> {
-    pub fn or_insert(self, default: T) -> &'m mut T {
-        match self {
-            MapEntry::Occupied(o) => o.into_mut(),
-            MapEntry::Vacant(v) => v.insert(default),
-        }
-    }
-}
-
-// Occupied
-
-impl<'m, T> OccupiedMapEntry<'m, T> {
-    pub fn into_mut(self) -> &'m mut T {
-        unsafe { self.node.as_mut() }
-    }
-}
-
-// Vacant
-
-impl<'m, T> VacantMapEntry<'m, T> {
-    pub fn insert(self, value: T) -> &'m mut T {
-        unsafe {
-            let node = self.map.insert_and_get_ref(self.coord, value);
-            node.as_mut()
-        }
-    }
 }

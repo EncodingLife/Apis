@@ -1,18 +1,22 @@
 #![cfg(feature = "bevy")]
 
+use std::f32::consts::PI;
+
 use bevy::{prelude::Primitive2d, render::{mesh::{Indices, Mesh, Meshable, PrimitiveTopology}, render_asset::RenderAssetUsages}};
 use bevy::math::{Vec2,Vec3,Vec4};
 
-use crate::HexLayout;
+use crate::{HexOrientation, HexWorld};
+
 
 #[derive(Clone, Copy, Debug)]
 pub struct Hexagon {
-    hex_layout: HexLayout
+    orientation: HexOrientation,
+    size: Vec2
 }
 
 impl Hexagon {
-    pub fn new(hex_layout: HexLayout) -> Self {
-        Self { hex_layout }
+    pub fn new(orientation: HexOrientation, size: f32) -> Self {
+        Self { orientation, size: Vec2::new(size, size) }
     }
 }
 
@@ -21,24 +25,24 @@ impl Primitive2d for Hexagon {}
 impl Meshable for Hexagon {
     type Output = HexagonMeshBuilder;
     fn mesh(&self) -> Self::Output {
-        HexagonMeshBuilder { hex_layout: self.hex_layout}
+        HexagonMeshBuilder { hexagon: *self }
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct HexagonMeshBuilder {
-    hex_layout: HexLayout
+    hexagon: Hexagon
 }
 
 impl HexagonMeshBuilder {
     pub fn build(&self) -> Mesh {
-        let verts = self.hex_layout.polygon_corners().to_vec();
+        let verts = self.hexagon.polygon_corners().to_vec();
 
         let pos : Vec<Vec3> = verts.iter().map(|v| Vec3::new(v.x, v.y, 0.0)).collect();
         let normals = vec![[0.0,0.0,1.0]; 6];
 
         let uvs: Vec<Vec2> = (0..6).map(|i| {
-            let a = HexLayout::get_corner_angle(i);
+            let a = self.hexagon.get_corner_angle(i);
             Vec2::new(0.5 * (a.cos() + 1.0), 1.0 - 0.5 * (a.sin() + 1.0))
         }).collect();
 
@@ -63,5 +67,36 @@ impl HexagonMeshBuilder {
 impl From<Hexagon> for Mesh {
     fn from(hex: Hexagon) -> Self {
         hex.mesh().build()
+    }
+}
+
+impl<U> HexWorld<U> where f32: std::convert::From<U>, U: std::convert::From<f32>, U: Copy  {
+    pub fn get_shape(&self) -> Hexagon {
+        Hexagon::new(self.orientation, self.cell_size.into())
+    }
+
+    pub fn get_mesh_builder(&self) -> HexagonMeshBuilder {
+        let hex = self.get_shape();
+        hex.mesh()
+    }
+}
+
+impl Hexagon {
+    fn polygon_corners(self) -> [Vec2; 6] {
+        let mut corners = [Vec2::default();6];
+        for i in 0u8..6u8 {
+            corners[i as usize] = self.hex_corner_offset(self.size, i);
+        }
+        corners
+    }
+
+    fn get_corner_angle(self, corner: u8) -> f32 {
+        // 'as f32' may cause problems but for now its fine
+        2.0 * PI * (self.orientation.start_angle() + corner as f32) / 6.0
+    }
+
+    fn hex_corner_offset(self, size: Vec2, corner: u8) -> Vec2 {
+        let a = self.get_corner_angle(corner);
+        Vec2::new(size.x * a.cos(), size.y * a.sin())
     }
 }

@@ -1,13 +1,9 @@
 use glam::{Vec2, Vec3};
 
-use crate::{hex_trait::HexCoordinate, HexLayout};
+use crate::{edge, hex_trait::HexCoordinate, Edge, HexOrientation};
 use core::fmt::Debug;
 use std::{fmt::Display, ops::{Add, Sub}};
 
-static F0: f32 = 3.0/2.0;
-const F1: f32 = 0.0;
-const F2: f32 = 0.86602540378; // f32::sqrt(3.0) / 2.0;
-const F3: f32 = 1.73205080757; // f32::sqrt(3.0);
 
 
 #[derive(Debug, Eq, Clone, Copy, Hash)]
@@ -26,22 +22,16 @@ impl HexCoordinate<i32> for HexCoord {
         (d.0[0].abs() + d.0[1].abs() + d.0[2].abs()) / 2
     }
 
-    fn to_world(&self, layout: HexLayout) -> Vec2 {
-        let q = self.0[0] as f32;
-        let r = self.0[1] as f32;
-
-        let x = (F0 * q + F1 * r) * layout.size.x;
-        let y = (F2 * q + F3 * r) * layout.size.y;
-        Vec2::new(x,y)
-    }
-
-    fn to_world_v3(&self, layout: HexLayout) -> Vec3 {
-        let v2 = self.to_world(layout);
-        Vec3::new(v2.x, v2.y, 0.0)
-    }
-
     fn qrs(&self) -> (i32,i32,i32) {
         (self.0[0], self.0[1], self.0[2])
+    }
+
+    fn qrs_f32(&self) -> (f32,f32,f32) {
+        (self.0[0] as f32, self.0[1] as f32, self.0[2] as f32)
+    }
+
+    fn neighbour(self, edge: Edge) -> Self {
+        self + edge.offset_flat()
     }
 }
 

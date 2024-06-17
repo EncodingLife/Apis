@@ -1,11 +1,8 @@
-use glam::{Vec2, Vec3};
-
-use crate::HexLayout;
+use crate::Edge;
 
 pub trait HexCoordinate<T> {
     fn qrs(&self) -> (T,T,T);
-
+    fn qrs_f32(&self) -> (f32,f32,f32);
     fn dist(&self, rhs: Self) -> T;
-    fn to_world(&self, layout: HexLayout) -> Vec2;
-    fn to_world_v3(&self, layout: HexLayout) -> Vec3;
+    fn neighbour(self, edge: Edge) -> Self;
 }

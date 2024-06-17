@@ -1,5 +1,9 @@
-mod node_ref;
+mod cell_ref;
+mod cell;
 mod map;
 mod entry;
+mod neighbourhood;
 #[cfg(test)]
-mod test;
+mod tests;
+
+pub use map::*;
