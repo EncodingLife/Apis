@@ -14,6 +14,10 @@ impl HexCoord {
         assert_eq!(q+r+s, 0, "QRS must add up to 0");
         Self([q,r,s])
     }
+
+    pub fn from_qr(q: i32, r: i32) -> Self {
+        Self::new(q,r,-q-r)
+    }
 }
 
 impl HexCoordinate<i32> for HexCoord {

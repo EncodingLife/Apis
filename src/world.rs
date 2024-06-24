@@ -3,7 +3,7 @@ use crate::{constants::*, HexCoord, HexCoordinate, HexOrientation};
 #[derive(Copy, Clone)]
 pub enum HexWorldShape {
     // Hexagon with it's width in cells
-    Hexagon(i32),
+    Hexagon(usize),
     // Rectangle with it's width and height in cells
     Square(usize, usize)
 }
@@ -48,11 +48,12 @@ impl<U> HexWorld<U> where U: Copy, f32: std::convert::From<U>, U: std::convert::
 
         let x = (F0 * q + F1 * r) * size;
         let y = (F2 * q + F3 * r) * size;
-        Vec2::new(x,y)
+
+        Vec2::new(x,-y)
     }
 
     pub fn coord_to_world_v3(&self, coord: HexCoord) -> Vec3 {
-        let v2 = self.coord_to_world(coord);
-        Vec3::new(v2.x, v2.y, 0.0)
+        let v = self.coord_to_world(coord);
+        Vec3::new(v.x, v.y, 0.0)
     }
 }

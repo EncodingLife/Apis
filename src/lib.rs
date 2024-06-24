@@ -6,9 +6,9 @@ mod orientation;
 mod shape;
 mod edge;
 mod world;
-#[cfg(feature = "map")]
-mod map;
+mod flat_map;
 
+pub use crate::flat_map::*;
 pub use crate::hex_coord::HexCoord;
 pub use crate::hex_trait::HexCoordinate;
 pub use crate::orientation::HexOrientation;
@@ -16,8 +16,6 @@ pub use crate::edge::Edge;
 pub use crate::world::{HexWorld, HexWorldShape};
 #[cfg(feature = "bevy")]
 pub use crate::shape::*;
-// #[cfg(feature = "map")]
-// pub use crate::map2::*;
 
 pub use glam::{Vec2, Vec3};
 
