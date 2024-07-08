@@ -2,9 +2,9 @@ use test_case::test_case;
 
 // Indexer
 
-use crate::{flat_map::indexer::Indexer, HexCoord};
+use crate::{flat_map::indexer::Indexer, Edge, FlatMap, HexCoord, HexCoordinate, HexWorldShape};
 
-use super::indexer::HexagonIndexer;
+use super::{indexer::HexagonIndexer, neighbourhood};
 
 #[test_case(1, 1)]
 #[test_case(2, 7)]
@@ -57,4 +57,57 @@ pub fn hexagon_indexer_hex_to_index_to_hex(radius: usize, q: i32, r: i32) {
     let indexer = HexagonIndexer::new(radius);
     let coords = HexCoord::from_qr(q, r);
     assert_eq!(indexer.coords(indexer.index(coords)), coords);
+}
+
+
+// Neighbourhoods
+#[test]
+pub fn neighbours_returns_correct_coords() {
+    let map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2));
+    let center = HexCoord::from_qr(0,0);
+
+    let neighbourhood = map.neighbourhood(center);
+
+    assert_eq!(neighbourhood[0].coords, center.neighbour(Edge::QS));
+    assert_eq!(neighbourhood[1].coords, center.neighbour(Edge::Q));
+    assert_eq!(neighbourhood[2].coords, center.neighbour(Edge::S));
+    assert_eq!(neighbourhood[3].coords, center);
+    assert_eq!(neighbourhood.center().coords, center);
+    assert_eq!(neighbourhood[4].coords, center.neighbour(Edge::QR));
+    assert_eq!(neighbourhood[5].coords, center.neighbour(Edge::RS));
+    assert_eq!(neighbourhood[6].coords, center.neighbour(Edge::R));
+
+    assert_eq!(neighbourhood.center().value, None);
+}
+
+#[test]
+pub fn neighbours_on_map_edge_returns_correct_coords() {
+    let map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2));
+    let center = HexCoord::from_qr(1,-1);
+
+    let neighbourhood = map.neighbourhood(center);
+
+    assert_eq!(neighbourhood[0].coords, center.neighbour(Edge::QS));
+    assert_eq!(neighbourhood[1].coords, center.neighbour(Edge::Q));
+    assert_eq!(neighbourhood[2].coords, center.neighbour(Edge::S));
+    assert_eq!(neighbourhood[3].coords, center);
+    assert_eq!(neighbourhood.center().coords, center);
+    assert_eq!(neighbourhood[4].coords, center.neighbour(Edge::QR));
+    assert_eq!(neighbourhood[5].coords, center.neighbour(Edge::RS));
+    assert_eq!(neighbourhood[6].coords, center.neighbour(Edge::R));
+
+    assert_eq!(neighbourhood.center().value, None);
+}
+
+#[test]
+pub fn neighbourhood_with_values() {
+    let mut map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2));
+    let center = HexCoord::from_qr(-1,0);
+
+    map.set(center.neighbour(Edge::RS), Some(true));
+
+    let neighbourhood = map.neighbourhood(center);
+
+    assert_eq!(neighbourhood.center().value, None);
+    assert_eq!(neighbourhood[5].value, Some(true));
 }

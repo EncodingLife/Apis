@@ -5,7 +5,7 @@
     /       \
     \       /
   s  \_____/  r
-        sr
+        rs
 */
 
 use crate::HexCoord;
