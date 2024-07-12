@@ -2,7 +2,7 @@
 
 use std::f32::consts::PI;
 
-use bevy::{prelude::Primitive2d, render::{mesh::{Indices, Mesh, Meshable, PrimitiveTopology}, render_asset::RenderAssetUsages}};
+use bevy::{prelude::Primitive2d, render::{mesh::{Indices, Mesh, MeshBuilder, Meshable, PrimitiveTopology}, render_asset::RenderAssetUsages}};
 use bevy::math::{Vec2,Vec3,Vec4};
 
 use crate::{HexOrientation, HexWorld};
@@ -34,8 +34,8 @@ pub struct HexagonMeshBuilder {
     hexagon: Hexagon
 }
 
-impl HexagonMeshBuilder {
-    pub fn build(&self) -> Mesh {
+impl MeshBuilder for HexagonMeshBuilder {
+    fn build(&self) -> Mesh {
         let verts = self.hexagon.polygon_corners().to_vec();
 
         let pos : Vec<Vec3> = verts.iter().map(|v| Vec3::new(v.x, v.y, 0.0)).collect();

@@ -5,3 +5,4 @@ mod neighbourhood;
 mod tests;
 
 pub use map::{FlatMap, CellBucket};
+pub use indexer::MapIndex;

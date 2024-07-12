@@ -5,12 +5,12 @@ use bevy::log::debug;
 
 use crate::{HexCoord, HexCoordinate, HexWorldShape};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum MapIndex {
     Hexagon(HexagonIndexer)
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct HexagonIndexer {
     radius: usize,
     capacity: i32,
@@ -18,7 +18,7 @@ pub struct HexagonIndexer {
 }
 
 impl MapIndex {
-    pub(crate) fn new(shape: crate::HexWorldShape) -> Self {
+    pub fn new(shape: crate::HexWorldShape) -> Self {
         match shape {
             crate::HexWorldShape::Hexagon(radius) => Self::Hexagon(HexagonIndexer::new(radius)),
             crate::HexWorldShape::Square(_, _) => todo!(),
