@@ -31,6 +31,18 @@ impl MapIndex {
             MapIndex::Hexagon(indexer) => indexer.index(coord),
         }
     }
+    #[inline]
+
+    pub fn try_index(self, coord: HexCoord) -> Option<usize> {
+        let i = match self {
+            MapIndex::Hexagon(indexer) => indexer.index(coord),
+        };
+        if i >= self.capacity() {
+            None
+        } else {
+            Some(i)
+        }
+    }
 
     #[inline]
     pub fn capacity(self) -> usize {

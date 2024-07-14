@@ -5,4 +5,5 @@ pub trait HexCoordinate<T> {
     fn qrs_f32(&self) -> (f32,f32,f32);
     fn dist(&self, rhs: Self) -> T;
     fn neighbour(self, edge: Edge) -> Self;
+    fn ring(self, radius: usize) -> Vec<Self> where Self: Sized;
 }

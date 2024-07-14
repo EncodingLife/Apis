@@ -44,4 +44,16 @@ impl Edge {
             Edge::QS => 5,
         }
     }
+
+    pub fn from_index(i: usize) -> Self {
+        match i {
+            0 => Edge::Q,
+            1 => Edge::QR,
+            2 => Edge::R,
+            3 => Edge::RS,
+            4 => Edge::S,
+            5 => Edge::QS,
+            _ => panic!("Index '{i}' out of range")
+        }
+    }
 }

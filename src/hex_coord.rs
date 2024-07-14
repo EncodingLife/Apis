@@ -2,7 +2,7 @@ use glam::{Vec2, Vec3};
 
 use crate::{edge, hex_trait::HexCoordinate, Edge, HexOrientation};
 use core::fmt::Debug;
-use std::{fmt::Display, ops::{Add, Sub}};
+use std::{fmt::Display, ops::{Add, Mul, Sub}};
 
 
 
@@ -37,7 +37,21 @@ impl HexCoordinate<i32> for HexCoord {
     fn neighbour(self, edge: Edge) -> Self {
         self + edge.offset_flat()
     }
+
+    fn ring(self, radius: usize) -> Vec<Self> {
+        let mut result = Vec::with_capacity(radius * 6);
+
+        let mut coords = self + Edge::S.offset_flat() * radius.try_into().unwrap();
+        for e in 0..6 {
+            for _ in 0..radius {
+                result.push(coords);
+                coords = coords.neighbour(Edge::from_index(e))
+            }
+        }
+        result
+    }
 }
+
 
 
 impl Display for HexCoord {
@@ -68,6 +82,14 @@ impl Sub for HexCoord {
     }
 }
 
+impl Mul<i32> for HexCoord{
+    type Output = HexCoord;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Self::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
+    }
+}
+
 #[macro_export]
 macro_rules! hex {
     ($q:literal, $r:literal) => {
@@ -86,6 +108,7 @@ macro_rules! hex {
 
 #[cfg(test)]
 mod test {
+    use test_case::test_case;
     use super::*;
 
     #[test]
@@ -118,5 +141,33 @@ mod test {
         assert_eq!(hex!(2,1,-3).dist(hex!(1,2,-3)), 1);
         assert_eq!(hex!(0,-4,4).dist(hex!(0,4,-4)), 8);
         assert_eq!(hex!(3,-1,-2).dist(hex!(1,0,-1)), 2);
+    }
+
+    #[test]
+    fn ring() {
+        let r = HexCoord::new(1,-1, 0).ring(2);
+        assert_eq!(r.len(), 12);
+        assert!(r.contains(&HexCoord::from_qr(1, -3)));
+        assert!(r.contains(&HexCoord::from_qr(2, -3)));
+        assert!(r.contains(&HexCoord::from_qr(3, -3)));
+        assert!(r.contains(&HexCoord::from_qr(3, -2)));
+        assert!(r.contains(&HexCoord::from_qr(3, -1)));
+        assert!(r.contains(&HexCoord::from_qr(2, 0)));
+        assert!(r.contains(&HexCoord::from_qr(1, 1)));
+        assert!(r.contains(&HexCoord::from_qr(0, 1)));
+        assert!(r.contains(&HexCoord::from_qr(-1, 1)));
+        assert!(r.contains(&HexCoord::from_qr(-1, 0)));
+        assert!(r.contains(&HexCoord::from_qr(-1, -1)));
+        assert!(r.contains(&HexCoord::from_qr(0, -2)));
+    }
+
+    #[test_case(0,0,5)]
+    #[test_case(4,5,3)]
+    #[test_case(-88,200,300)]
+    fn ring_scenarios(q: i32, r: i32, radius:usize) {
+        let center = HexCoord::from_qr(q, r);
+        let ring = center.ring(radius);
+        // assert_eq!(ring.len(), 6*radius);
+        assert!(ring.iter().all(|coord| coord.dist(center) == radius.try_into().unwrap()));
     }
 }
