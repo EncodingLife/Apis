@@ -1,3 +1,5 @@
+use std::num::TryFromIntError;
+
 #[cfg(not(feature="bevy"))]
 use log::debug;
 #[cfg(feature = "bevy")]
@@ -34,13 +36,9 @@ impl MapIndex {
     #[inline]
 
     pub fn try_index(self, coord: HexCoord) -> Option<usize> {
-        let i = match self {
-            MapIndex::Hexagon(indexer) => indexer.index(coord),
-        };
-        if i >= self.capacity() {
-            None
-        } else {
-            Some(i)
+        match self {
+            MapIndex::Hexagon(indexer) => indexer.try_index(coord),
+            _ => None
         }
     }
 
@@ -71,15 +69,16 @@ impl HexagonIndexer {
 }
 
 // https://observablehq.com/@sanderevers/hexmod-representation
-fn hex_mod(coords: HexCoord, shift: i32, area: i32) -> usize {
+fn hex_mod(coords: HexCoord, shift: i32, area: i32) -> Result<usize, TryFromIntError> {
     let (q, r, s) = coords.qrs();
     let t = ((q + (s*shift)) + area) % area;
-    match usize::try_from(t) {
-        Ok(u) => u,
-        Err(_) => {
-            println!("error calc hex_mod for {coords:?}, shift:{shift}, a:{area} => {}", (t));
-            panic!("");
-        }
+    usize::try_from(t)
+}
+
+fn try_hex_mod(coords: HexCoord, shift: i32, area: i32) -> Option<usize> {
+    match hex_mod(coords, shift, area) {
+        Ok(u) => Some(u),
+        Err(_) => None
     }
 }
 
@@ -102,6 +101,7 @@ fn hexagon_shape_area(radius: usize) -> i32 {
 
 pub trait Indexer {
     fn index(&self, coord: HexCoord) -> usize;
+    fn try_index(&self, coord: HexCoord) -> Option<usize>;
     fn capacity(&self) -> usize;
     fn coords(&self, index: usize) -> HexCoord;
 }
@@ -114,7 +114,12 @@ impl Indexer for HexagonIndexer {
 
     #[inline]
     fn index(&self, coords: HexCoord) -> usize {
-        hex_mod(coords, self.shift, self.capacity)
+        hex_mod(coords, self.shift, self.capacity).unwrap()
+    }
+
+    #[inline]
+    fn try_index(&self, coords: HexCoord) -> Option<usize> {
+        try_hex_mod(coords, self.shift, self.capacity)
     }
 
     #[inline]

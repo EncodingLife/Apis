@@ -2,7 +2,7 @@ use test_case::test_case;
 
 // Indexer
 
-use crate::{flat_map::indexer::Indexer, Edge, FlatMap, HexCoord, HexCoordinate, HexWorldShape};
+use crate::{flat_map::indexer::Indexer, Edge, FlatMap, HexCoord, HexCoordinate, HexWorldShape, MapIndex};
 
 use super::{indexer::HexagonIndexer, neighbourhood};
 
@@ -110,4 +110,11 @@ pub fn neighbourhood_with_values() {
 
     assert_eq!(neighbourhood.center().value, None);
     assert_eq!(neighbourhood[5].value, Some(true));
+}
+
+
+#[test]
+pub fn try_index_does_not_error() {
+    let indexer = MapIndex::new(HexWorldShape::Hexagon(3));
+    assert_eq!(indexer.try_index(HexCoord::from_qr(100, 100)), None);
 }
