@@ -167,7 +167,7 @@ mod test {
     fn ring_scenarios(q: i32, r: i32, radius:usize) {
         let center = HexCoord::from_qr(q, r);
         let ring = center.ring(radius);
-        // assert_eq!(ring.len(), 6*radius);
-        assert!(ring.iter().all(|coord| coord.dist(center) == radius.try_into().unwrap()));
+        let ri: i32 = radius.try_into().unwrap();
+        assert!(ring.iter().all(|coord| coord.dist(center) == ri));
     }
 }
