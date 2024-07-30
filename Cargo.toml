@@ -1,2 +1,18 @@
-[workspace]
-members = ["crates/*"]
+[package]
+name = "apis"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { version = "0.14.0", default-features = false, features = ["bevy_render"], optional = true }
+glam = { version= "0.25.0", features = ["bytemuck"] }
+log = "0.4.21"
+
+[dev-dependencies]
+test-case = "*"
+
+[features]
+default = []
+bevy = ["dep:bevy"]
