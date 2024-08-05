@@ -1,21 +1,22 @@
 mod constants;
-mod hex_trait;
-mod fractional_coord;
+mod edge;
+mod flat_map;
 mod hex_coord;
+mod hex_trait;
+mod index;
 mod orientation;
 mod shape;
-mod edge;
 mod world;
-mod flat_map;
 
+pub use crate::edge::Edge;
 pub use crate::flat_map::*;
 pub use crate::hex_coord::HexCoord;
 pub use crate::hex_trait::HexCoordinate;
+pub use crate::index::map_index::MapIndex;
 pub use crate::orientation::HexOrientation;
-pub use crate::edge::Edge;
-pub use crate::world::{HexWorld, HexWorldShape};
 #[cfg(feature = "bevy")]
 pub use crate::shape::*;
+pub use crate::world::{HexWorld, HexWorldShape};
 
 pub use glam::{Vec2, Vec3};
 

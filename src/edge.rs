@@ -10,8 +10,6 @@
 
 use crate::HexCoord;
 
-pub const Edges: [Edge; 6] = [Edge::Q, Edge::QR, Edge::R, Edge::RS, Edge::S, Edge::QS];
-
 #[derive(Copy, Clone)]
 pub enum Edge {
     Q,
@@ -53,7 +51,7 @@ impl Edge {
             3 => Edge::RS,
             4 => Edge::S,
             5 => Edge::QS,
-            _ => panic!("Index '{i}' out of range")
+            _ => panic!("Index '{i}' out of range"),
         }
     }
 }
