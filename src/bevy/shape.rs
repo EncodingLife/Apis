@@ -95,7 +95,7 @@ where
 }
 
 impl Hexagon {
-    fn polygon_corners(self) -> [Vec2; 6] {
+    pub fn polygon_corners(self) -> [Vec2; 6] {
         let mut corners = [Vec2::default(); 6];
         for i in 0u8..6u8 {
             corners[i as usize] = self.hex_corner_offset(self.size, i);
@@ -104,7 +104,6 @@ impl Hexagon {
     }
 
     fn get_corner_angle(self, corner: u8) -> f32 {
-        // 'as f32' may cause problems but for now its fine
         2.0 * PI * (self.orientation.start_angle() + corner as f32) / 6.0
     }
 

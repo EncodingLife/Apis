@@ -151,11 +151,11 @@ impl<T: ?Sized + Default + Copy> FlatMap<T> {
 
 #[cfg(test)]
 mod test {
-    use crate::{FlatMap, HexCoord, HexWorldShape};
+    use crate::{FlatMap, HexCoord, HexOrientation, HexWorldShape};
 
     #[test]
     fn get_segment_start_is_index_capacity() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5), || true);
+        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_qr(-1, 1));
 
@@ -166,7 +166,7 @@ mod test {
 
     #[test]
     fn get_segment_start_is_one_less_than_index_capacity() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5), || true);
+        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_qr(-2, 2));
 
@@ -177,7 +177,7 @@ mod test {
 
     #[test]
     fn get_segment_start_coord_0_0() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5), || true);
+        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_qr(0, 0));
 

@@ -16,12 +16,12 @@ pub enum MapIndex {
 impl MapIndex {
     pub fn new(shape: crate::HexWorldShape) -> Self {
         match shape {
-            crate::HexWorldShape::Hexagon(radius) => Self::Hexagon(HexagonIndexer::new(radius)),
-            crate::HexWorldShape::Rectangle(width, height) => {
-                Self::Rectangle(RectangleIndexer::new(width, height))
+            crate::HexWorldShape::Hexagon(radius, orientation) => Self::Hexagon(HexagonIndexer::new(radius, orientation)),
+            crate::HexWorldShape::Rectangle(width, height, orientation) => {
+                Self::Rectangle(RectangleIndexer::new(width, height, orientation))
             }
-            crate::HexWorldShape::Square(width) => {
-                Self::Rectangle(RectangleIndexer::new(width, width))
+            crate::HexWorldShape::Square(width, orientation) => {
+                Self::Rectangle(RectangleIndexer::new(width, width, orientation))
             }
         }
     }

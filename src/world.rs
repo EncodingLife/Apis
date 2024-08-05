@@ -3,11 +3,11 @@ use crate::{constants::*, HexCoord, HexCoordinate, HexOrientation};
 #[derive(Copy, Clone)]
 pub enum HexWorldShape {
     // Hexagon with it's radius in cells incl origin
-    Hexagon(usize),
+    Hexagon(usize,HexOrientation),
     // Rectangle with it's width and height in cells
-    Rectangle(usize, usize),
+    Rectangle(usize, usize,HexOrientation),
     // Rectangle with equal width and height
-    Square(usize),
+    Square(usize,HexOrientation),
 }
 #[cfg(not(feature = "bevy"))]
 type Vec2 = glam::Vec2;
@@ -56,8 +56,8 @@ where
 
         let size: f32 = self.cell_size.into();
 
-        let x = (F0 * q + F1 * r) * size;
-        let y = (F2 * q + F3 * r) * size;
+        let x = (self.orientation.f0() * q + self.orientation.f1() * r) * size;
+        let y = (self.orientation.f2() * q + self.orientation.f3() * r) * size;
 
         Vec2::new(x, -y)
     }

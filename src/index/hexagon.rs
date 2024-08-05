@@ -1,6 +1,6 @@
 use std::num::TryFromIntError;
 
-use crate::{HexCoord, HexCoordinate};
+use crate::{HexCoord, HexCoordinate, HexOrientation};
 
 use super::Indexer;
 
@@ -9,15 +9,17 @@ pub struct HexagonIndexer {
     radius: usize,
     capacity: i32,
     shift: i32,
+    orientation: HexOrientation
 }
 
 impl HexagonIndexer {
-    pub fn new(radius: usize) -> Self {
+    pub fn new(radius: usize, orientation: HexOrientation) -> Self {
         assert!(radius > 0);
         Self {
             radius,
             capacity: hexagon_shape_area(radius), // #https://observablehq.com/@sanderevers/hexmod-representation
             shift: 3 * (i32::try_from(radius).unwrap() - 1) + 2,
+            orientation
         }
     }
 }
@@ -35,12 +37,18 @@ impl Indexer for HexagonIndexer {
 
     #[inline]
     fn try_index(&self, coords: HexCoord) -> Option<usize> {
-        hex_mod(coords, self.shift, self.capacity).ok()
+        match self.orientation {
+            HexOrientation::Flat => hex_mod(coords, self.shift, self.capacity).ok(),
+            HexOrientation::Pointy => todo!(),
+        }
     }
 
     #[inline]
     fn coords(&self, index: usize) -> HexCoord {
-        inv_hex_mod(index, self.shift, i32::try_from(self.radius - 1).unwrap())
+        match self.orientation {
+            HexOrientation::Flat => inv_hex_mod(index, self.shift, i32::try_from(self.radius - 1).unwrap()),
+            HexOrientation::Pointy => todo!(),
+        }
     }
 }
 
@@ -81,7 +89,7 @@ mod test {
     #[test_case(4, 37)]
     #[test_case(5, 61)]
     pub fn hexagon_indexer_capacity(radius: usize, expected: usize) {
-        let indexer = HexagonIndexer::new(radius);
+        let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         assert_eq!(indexer.capacity(), expected)
     }
 
@@ -93,7 +101,7 @@ mod test {
     #[test_case(200)]
 
     pub fn hexagon_indexer_index_at_center_always_0(radius: usize) {
-        let indexer = HexagonIndexer::new(radius);
+        let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         assert_eq!(indexer.index(HexCoord::from_qr(0, 0)), 0)
     }
 
@@ -105,7 +113,7 @@ mod test {
     #[test_case(2,0,-1,5)]
     #[test_case(2,-1,1,6)]
     pub fn hexagon_indexer_index(radius: usize, q: i32, r: i32, expected: usize) {
-        let indexer = HexagonIndexer::new(radius);
+        let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         let coords = HexCoord::from_qr(q, r);
         assert_eq!(indexer.index(coords), expected);
     }
@@ -115,7 +123,7 @@ mod test {
     #[test_case(2,4,-1,0)]
 
     pub fn hexagon_indexer_coords(radius: usize, index: usize, expected_q: i32, expected_r: i32) {
-        let indexer = HexagonIndexer::new(radius);
+        let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         let coords = indexer.coords(index);
         assert_eq!(coords, HexCoord::from_qr(expected_q, expected_r))
     }
@@ -123,14 +131,14 @@ mod test {
     #[test_case(1, 0, 0)]
     #[test_case(3, 1, -1)]
     pub fn hexagon_indexer_hex_to_index_to_hex(radius: usize, q: i32, r: i32) {
-        let indexer = HexagonIndexer::new(radius);
+        let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         let coords = HexCoord::from_qr(q, r);
         assert_eq!(indexer.coords(indexer.index(coords)), coords);
     }
 
     #[test]
     pub fn try_index_does_not_error() {
-        let indexer = HexagonIndexer::new(3);
+        let indexer = HexagonIndexer::new(3, HexOrientation::Flat);
         assert_eq!(indexer.try_index(HexCoord::from_qr(100, 100)), None);
     }
 }
