@@ -50,6 +50,10 @@ impl Indexer for HexagonIndexer {
             HexOrientation::Pointy => todo!(),
         }
     }
+
+    fn offset_coord(&self, _col: i32, _row: i32) -> HexCoord {
+        todo!()
+    }
 }
 
 // https://observablehq.com/@sanderevers/hexmod-representation
@@ -102,7 +106,7 @@ mod test {
 
     pub fn hexagon_indexer_index_at_center_always_0(radius: usize) {
         let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
-        assert_eq!(indexer.index(HexCoord::from_qr(0, 0)), 0)
+        assert_eq!(indexer.index(HexCoord::from_axial(0, 0)), 0)
     }
 
     #[test_case(2, 0, 0, 0)]
@@ -114,7 +118,7 @@ mod test {
     #[test_case(2,-1,1,6)]
     pub fn hexagon_indexer_index(radius: usize, q: i32, r: i32, expected: usize) {
         let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
-        let coords = HexCoord::from_qr(q, r);
+        let coords = HexCoord::from_axial(q, r);
         assert_eq!(indexer.index(coords), expected);
     }
 
@@ -125,20 +129,20 @@ mod test {
     pub fn hexagon_indexer_coords(radius: usize, index: usize, expected_q: i32, expected_r: i32) {
         let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
         let coords = indexer.coords(index);
-        assert_eq!(coords, HexCoord::from_qr(expected_q, expected_r))
+        assert_eq!(coords, HexCoord::from_axial(expected_q, expected_r))
     }
 
     #[test_case(1, 0, 0)]
     #[test_case(3, 1, -1)]
     pub fn hexagon_indexer_hex_to_index_to_hex(radius: usize, q: i32, r: i32) {
         let indexer = HexagonIndexer::new(radius, HexOrientation::Flat);
-        let coords = HexCoord::from_qr(q, r);
+        let coords = HexCoord::from_axial(q, r);
         assert_eq!(indexer.coords(indexer.index(coords)), coords);
     }
 
     #[test]
     pub fn try_index_does_not_error() {
         let indexer = HexagonIndexer::new(3, HexOrientation::Flat);
-        assert_eq!(indexer.try_index(HexCoord::from_qr(100, 100)), None);
+        assert_eq!(indexer.try_index(HexCoord::from_axial(100, 100)), None);
     }
 }

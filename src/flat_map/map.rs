@@ -157,32 +157,32 @@ mod test {
     fn get_segment_start_is_index_capacity() {
         let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
-        let s = map.get_segment(HexCoord::from_qr(-1, 1));
+        let s = map.get_segment(HexCoord::from_axial(-1, 1));
 
-        assert_eq!(*s[0].unwrap().0, HexCoord::from_qr(-1, 1));
-        assert_eq!(*s[1].unwrap().0, HexCoord::from_qr(0, 0));
-        assert_eq!(*s[2].unwrap().0, HexCoord::from_qr(1, -1));
+        assert_eq!(*s[0].unwrap().0, HexCoord::from_axial(-1, 1));
+        assert_eq!(*s[1].unwrap().0, HexCoord::from_axial(0, 0));
+        assert_eq!(*s[2].unwrap().0, HexCoord::from_axial(1, -1));
     }
 
     #[test]
     fn get_segment_start_is_one_less_than_index_capacity() {
         let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
-        let s = map.get_segment(HexCoord::from_qr(-2, 2));
+        let s = map.get_segment(HexCoord::from_axial(-2, 2));
 
-        assert_eq!(*s[0].unwrap().0, HexCoord::from_qr(-2, 2));
-        assert_eq!(*s[1].unwrap().0, HexCoord::from_qr(-1, 1));
-        assert_eq!(*s[2].unwrap().0, HexCoord::from_qr(0, 0));
+        assert_eq!(*s[0].unwrap().0, HexCoord::from_axial(-2, 2));
+        assert_eq!(*s[1].unwrap().0, HexCoord::from_axial(-1, 1));
+        assert_eq!(*s[2].unwrap().0, HexCoord::from_axial(0, 0));
     }
 
     #[test]
     fn get_segment_start_coord_0_0() {
         let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
-        let s = map.get_segment(HexCoord::from_qr(0, 0));
+        let s = map.get_segment(HexCoord::from_axial(0, 0));
 
-        assert_eq!(*s[0].unwrap().0, HexCoord::from_qr(0, 0));
-        assert_eq!(*s[1].unwrap().0, HexCoord::from_qr(1, -1));
-        assert_eq!(*s[2].unwrap().0, HexCoord::from_qr(2, -2));
+        assert_eq!(*s[0].unwrap().0, HexCoord::from_axial(0, 0));
+        assert_eq!(*s[1].unwrap().0, HexCoord::from_axial(1, -1));
+        assert_eq!(*s[2].unwrap().0, HexCoord::from_axial(2, -2));
     }
 }

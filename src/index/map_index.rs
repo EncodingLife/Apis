@@ -57,4 +57,12 @@ impl MapIndex {
             MapIndex::Rectangle(indexer) => indexer.coords(index),
         }
     }
+
+    #[inline]
+    pub fn offset_coord(self, col: i32, row: i32) -> HexCoord {
+        match self {
+            MapIndex::Hexagon(indexer) => indexer.offset_coord(col, row),
+            MapIndex::Rectangle(indexer) => indexer.offset_coord(col, row),
+        }
+    }
 }

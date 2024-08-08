@@ -1,4 +1,3 @@
-mod constants;
 mod edge;
 mod flat_map;
 mod hex_coord;

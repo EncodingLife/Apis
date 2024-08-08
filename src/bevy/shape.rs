@@ -85,7 +85,7 @@ where
     U: Copy,
 {
     pub fn get_shape(&self) -> Hexagon {
-        Hexagon::new(self.orientation, self.cell_size.into())
+        Hexagon::new(*self.world_shape.orientation(), self.cell_size.into())
     }
 
     pub fn get_mesh_builder(&self) -> HexagonMeshBuilder {

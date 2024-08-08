@@ -14,7 +14,8 @@ impl HexCoord {
         Self([q, r, s])
     }
 
-    pub fn from_qr(q: i32, r: i32) -> Self {
+    #[inline]
+    pub fn from_axial(q: i32, r: i32) -> Self {
         Self::new(q, r, -q - r)
     }
 }
@@ -179,25 +180,25 @@ mod test {
     fn ring() {
         let r = HexCoord::new(1, -1, 0).ring(2);
         assert_eq!(r.len(), 12);
-        assert!(r.contains(&HexCoord::from_qr(1, -3)));
-        assert!(r.contains(&HexCoord::from_qr(2, -3)));
-        assert!(r.contains(&HexCoord::from_qr(3, -3)));
-        assert!(r.contains(&HexCoord::from_qr(3, -2)));
-        assert!(r.contains(&HexCoord::from_qr(3, -1)));
-        assert!(r.contains(&HexCoord::from_qr(2, 0)));
-        assert!(r.contains(&HexCoord::from_qr(1, 1)));
-        assert!(r.contains(&HexCoord::from_qr(0, 1)));
-        assert!(r.contains(&HexCoord::from_qr(-1, 1)));
-        assert!(r.contains(&HexCoord::from_qr(-1, 0)));
-        assert!(r.contains(&HexCoord::from_qr(-1, -1)));
-        assert!(r.contains(&HexCoord::from_qr(0, -2)));
+        assert!(r.contains(&HexCoord::from_axial(1, -3)));
+        assert!(r.contains(&HexCoord::from_axial(2, -3)));
+        assert!(r.contains(&HexCoord::from_axial(3, -3)));
+        assert!(r.contains(&HexCoord::from_axial(3, -2)));
+        assert!(r.contains(&HexCoord::from_axial(3, -1)));
+        assert!(r.contains(&HexCoord::from_axial(2, 0)));
+        assert!(r.contains(&HexCoord::from_axial(1, 1)));
+        assert!(r.contains(&HexCoord::from_axial(0, 1)));
+        assert!(r.contains(&HexCoord::from_axial(-1, 1)));
+        assert!(r.contains(&HexCoord::from_axial(-1, 0)));
+        assert!(r.contains(&HexCoord::from_axial(-1, -1)));
+        assert!(r.contains(&HexCoord::from_axial(0, -2)));
     }
 
     #[test_case(0, 0, 5)]
     #[test_case(4, 5, 3)]
     #[test_case(-88,200,300)]
     fn ring_scenarios(q: i32, r: i32, radius: usize) {
-        let center = HexCoord::from_qr(q, r);
+        let center = HexCoord::from_axial(q, r);
         let ring = center.ring(radius);
         let ri: i32 = radius.try_into().unwrap();
         assert!(ring.iter().all(|coord| coord.dist(center) == ri));

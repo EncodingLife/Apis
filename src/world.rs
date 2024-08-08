@@ -1,13 +1,13 @@
-use crate::{constants::*, HexCoord, HexCoordinate, HexOrientation};
+use crate::{HexCoord, HexCoordinate, HexOrientation, MapIndex};
 
 #[derive(Copy, Clone)]
 pub enum HexWorldShape {
     // Hexagon with it's radius in cells incl origin
-    Hexagon(usize,HexOrientation),
+    Hexagon(usize, HexOrientation),
     // Rectangle with it's width and height in cells
-    Rectangle(usize, usize,HexOrientation),
+    Rectangle(usize, usize, HexOrientation),
     // Rectangle with equal width and height
-    Square(usize,HexOrientation),
+    Square(usize, HexOrientation),
 }
 #[cfg(not(feature = "bevy"))]
 type Vec2 = glam::Vec2;
@@ -23,24 +23,24 @@ pub struct HexWorld<U>
 where
     U: Copy,
 {
-    pub orientation: HexOrientation,
     // #[cfg(not(feature="bevy"))]
     // pub cell_size: glam::Vec2,
     // #[cfg(feature = "bevy")]
     // pub cell_size: bevy::math::Vec2,
     pub cell_size: U,
     pub world_shape: HexWorldShape,
+    pub indexer: MapIndex
 }
 
 impl<U> HexWorld<U>
 where
     U: Copy,
 {
-    pub fn new(orientation: HexOrientation, cell_size: U, world_shape: HexWorldShape) -> Self {
+    pub fn new(world_shape: HexWorldShape, cell_size: U) -> Self {
         Self {
-            orientation,
             cell_size,
             world_shape,
+            indexer: MapIndex::new(world_shape)
         }
     }
 }
@@ -56,8 +56,8 @@ where
 
         let size: f32 = self.cell_size.into();
 
-        let x = (self.orientation.f0() * q + self.orientation.f1() * r) * size;
-        let y = (self.orientation.f2() * q + self.orientation.f3() * r) * size;
+        let x = (self.world_shape.orientation().f0() * q + self.world_shape.orientation().f1() * r) * size;
+        let y = (self.world_shape.orientation().f2() * q + self.world_shape.orientation().f3() * r) * size;
 
         Vec2::new(x, -y)
     }
@@ -65,5 +65,35 @@ where
     pub fn coord_to_world_v3(&self, coord: HexCoord) -> Vec3 {
         let v = self.coord_to_world(coord);
         Vec3::new(v.x, v.y, 0.0)
+    }
+
+    pub fn center(&self) -> HexCoord {
+        match self.world_shape {
+            HexWorldShape::Hexagon(_, _) => HexCoord::new(0,0,0),
+            HexWorldShape::Rectangle(_, _, _) | HexWorldShape::Square(_,_) => self.indexer.coord(self.indexer.capacity() / 2)
+        }
+    }
+}
+
+impl HexWorldShape {
+    pub fn orientation(&self) -> &HexOrientation {
+        match self {
+            HexWorldShape::Hexagon(_, o) |
+            HexWorldShape::Rectangle(_, _, o) |
+            HexWorldShape::Square(_, o) => o,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case(HexWorldShape::Square(5, HexOrientation::Pointy), HexCoord::from_axial(1,2))]
+    #[test_case(HexWorldShape::Square(5, HexOrientation::Flat), HexCoord::from_axial(2,1))]
+    fn world_center_tests(world_shape: HexWorldShape, expected: HexCoord) {
+        let world = HexWorld::new(world_shape, 1.0);
+        assert_eq!(world.center(), expected)
     }
 }

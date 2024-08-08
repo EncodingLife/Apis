@@ -4,7 +4,7 @@ use crate::{Edge, FlatMap, HexCoord, HexCoordinate, HexOrientation, HexWorldShap
 #[test]
 pub fn neighbours_returns_correct_coords() {
     let map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2, HexOrientation::Flat));
-    let center = HexCoord::from_qr(0, 0);
+    let center = HexCoord::from_axial(0, 0);
 
     let neighbourhood = map.neighbourhood(center);
 
@@ -23,7 +23,7 @@ pub fn neighbours_returns_correct_coords() {
 #[test]
 pub fn neighbours_on_map_edge_returns_correct_coords() {
     let map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2, HexOrientation::Flat));
-    let center = HexCoord::from_qr(1, -1);
+    let center = HexCoord::from_axial(1, -1);
 
     let neighbourhood = map.neighbourhood(center);
 
@@ -42,7 +42,7 @@ pub fn neighbours_on_map_edge_returns_correct_coords() {
 #[test]
 pub fn neighbourhood_with_values() {
     let mut map: FlatMap<bool> = FlatMap::new(HexWorldShape::Hexagon(2, HexOrientation::Flat));
-    let center = HexCoord::from_qr(-1, 0);
+    let center = HexCoord::from_axial(-1, 0);
 
     map.set(center.neighbour(Edge::RS), Some(true));
 

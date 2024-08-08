@@ -12,4 +12,5 @@ pub trait Indexer {
     fn try_index(&self, coord: HexCoord) -> Option<usize>;
     fn capacity(&self) -> usize;
     fn coords(&self, index: usize) -> HexCoord;
+    fn offset_coord(&self, col: i32, row: i32) -> HexCoord;
 }
