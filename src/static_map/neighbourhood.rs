@@ -8,7 +8,7 @@ pub struct NeighbourhoodNode<T> {
     pub value: Option<T>,
 }
 
-impl<T: ?Sized + Default + Copy> NeighbourhoodNode<T> {
+impl<T: ?Sized + Copy> NeighbourhoodNode<T> {
     pub fn new(coords: HexCoord, value: Option<T>) -> Self {
         Self { coords, value }
     }
@@ -28,7 +28,7 @@ pub struct Neighbourhood<T> {
     arr: [NeighbourhoodNode<T>; 7],
 }
 
-impl<T: ?Sized + Default + Copy> Neighbourhood<T> {
+impl<T: ?Sized + Copy> Neighbourhood<T> {
     pub(crate) fn new(
         top: [NeighbourhoodNode<T>; 2],
         middle: [NeighbourhoodNode<T>; 3],

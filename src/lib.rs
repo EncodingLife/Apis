@@ -1,5 +1,5 @@
 mod edge;
-mod flat_map;
+mod static_map;
 mod hex_coord;
 mod hex_trait;
 mod index;
@@ -10,7 +10,7 @@ mod world;
 pub mod bevy;
 
 pub use crate::edge::Edge;
-pub use crate::flat_map::*;
+pub use crate::static_map::*;
 pub use crate::hex_coord::HexCoord;
 pub use crate::hex_trait::HexCoordinate;
 pub use crate::index::map_index::MapIndex;

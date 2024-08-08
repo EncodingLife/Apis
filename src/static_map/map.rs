@@ -6,7 +6,7 @@ use bevy::log::debug;
 use log::debug;
 
 use crate::{
-    flat_map::neighbourhood::NeighbourhoodNode, index::map_index::MapIndex, Edge, HexCoord,
+    static_map::neighbourhood::NeighbourhoodNode, index::map_index::MapIndex, Edge, HexCoord,
     HexCoordinate, HexWorldShape,
 };
 
@@ -34,12 +34,12 @@ impl<T> Default for CellBucket<T> {
     }
 }
 
-pub struct FlatMap<T> {
+pub struct StaticMap<T> {
     index: MapIndex,
     store: Vec<CellBucket<T>>,
 }
 
-impl<T: ?Sized + Default + Copy> FlatMap<T> {
+impl<T: ?Sized + Copy> StaticMap<T> {
     pub fn new(shape: HexWorldShape) -> Self {
         let indexer = MapIndex::new(shape);
         let mut vec = Vec::new();
@@ -103,6 +103,13 @@ impl<T: ?Sized + Default + Copy> FlatMap<T> {
         self.store.iter()
     }
 
+    pub fn coord_iter(&self) -> impl Iterator<Item = (HexCoord, Option<&T>)> {
+       self.store.iter().enumerate().map(|(i, b)| match b {
+            CellBucket::Occupied(c, t) => (*c, Some(t)),
+            CellBucket::Empty => (self.index.coord(i), None),
+        })
+    }
+
     pub fn neighbourhood(&self, coords: HexCoord) -> Neighbourhood<T> {
         let t = self.get_segment(coords.neighbour(Edge::QS));
         let top = [
@@ -151,11 +158,11 @@ impl<T: ?Sized + Default + Copy> FlatMap<T> {
 
 #[cfg(test)]
 mod test {
-    use crate::{FlatMap, HexCoord, HexOrientation, HexWorldShape};
+    use crate::{StaticMap, HexCoord, HexOrientation, HexWorldShape};
 
     #[test]
     fn get_segment_start_is_index_capacity() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
+        let map: StaticMap<bool> = StaticMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_axial(-1, 1));
 
@@ -166,7 +173,7 @@ mod test {
 
     #[test]
     fn get_segment_start_is_one_less_than_index_capacity() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
+        let map: StaticMap<bool> = StaticMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_axial(-2, 2));
 
@@ -177,7 +184,7 @@ mod test {
 
     #[test]
     fn get_segment_start_coord_0_0() {
-        let map: FlatMap<bool> = FlatMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
+        let map: StaticMap<bool> = StaticMap::init_with(HexWorldShape::Hexagon(5, HexOrientation::Flat), || true);
 
         let s = map.get_segment(HexCoord::from_axial(0, 0));
 

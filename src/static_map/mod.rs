@@ -3,4 +3,4 @@ mod neighbourhood;
 #[cfg(test)]
 mod tests;
 
-pub use map::{CellBucket, FlatMap};
+pub use map::{CellBucket, StaticMap};
